@@ -39,7 +39,7 @@ Fetch text and sets it as `.innerHTML`.
 
     q('body').htmlFetch('./data/news.txt');
 
-### .templateDefine() - v1
+### .templateDefine() - v2
 
 Defines a Template function.
 
@@ -47,7 +47,7 @@ Defines a Template function.
         return data.forEach((v)=>{`<li>${v}</li>`)}.join('')
     });
 
-### .templateUpdate() - v1
+### .templateUpdate() - v2
 
 Updates a Template.
 
@@ -57,13 +57,13 @@ Updates a Template.
         'Pudding',
     ]);
 
-### .templateFetch() - v1
+### .templateFetch() - v2
 
 Fetches JSON Data and passes it to the `.templateDefine()` function.
 
     q('ul').templateFetch('./favoriteFood.json');
 
-### .stateDefine() - v2
+### .stateDefine() - v3
 
     q('ul').stateDefine('favorite food', (food)=>{
         return data.forEach((v)=>{`<li class="favoriteFood">${v}</li>`)}.join('')
@@ -72,7 +72,7 @@ Fetches JSON Data and passes it to the `.templateDefine()` function.
         return data.forEach((v)=>{`<li class="favoriteDrinks">${v}</li>`)}.join('')
     });
 
-### .stateUpdate() - v2
+### .stateUpdate() - v3
 
     q('ul').templateUpdate('favorite food',[
         'Cookies',
@@ -80,7 +80,7 @@ Fetches JSON Data and passes it to the `.templateDefine()` function.
         'Pudding',
     ]);
 
-### .stateFetch() - v2
+### .stateFetch() - v3
 
     q('ul').stateFetch('favorite food', './favoriteFood.json');
 
