@@ -80,6 +80,7 @@ function q(query){
 		},
 		templateDefine: function(callback){
 			return this.forEach((node)=>{
+				node.setAttribute('data-template', 'true');
 				node.templateCallback = callback
 			})
 		},
@@ -102,6 +103,7 @@ function q(query){
 		},
 		stateDefine: function(state, callback){
 			return this.forEach((node)=>{
+				node.setAttribute('data-state', state);
 				node.states = node.states || {};
 				node.states[state] = callback;
 			})
