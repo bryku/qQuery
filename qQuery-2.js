@@ -100,29 +100,6 @@ function q(query){
 					.catch((err)=>{console.warn(`$('${this.query}').templateFetch('${url}') - Error 404`)})
 			})
 		},
-		stateDefine: function(state, callback){
-			return this.forEach((node)=>{
-				node.states = node.states || {};
-				node.states[state] = callback;
-			})
-		},
-		stateUpdate: function(state, data){
-			return this.forEach((node)=>{
-				if(!node.states[state]){
-					console.warn(`$('${this.query}').stateUpdate('${state}') - No state defined`);
-				}else{
-					node.innerHTML = node.states[state](data, node)
-				}				
-			})
-		},
-		stateFetch: function(state, url, options = {}){
-			this.forEach((node)=>{
-				fetch(url, options)
-					.then((res)=>{return res.json()})
-					.then((dat)=>{node.innerHTML = node.states[state](dat, node)})
-					.catch((err)=>{console.warn(`$('${this.query}').stateFetch('${url}') - Error 404`)})
-			})
-		},
 		classAdd: function(...classes){
 			return this.forEach((node)=>{
 				node.classList.add(...classes)
