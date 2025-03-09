@@ -80,6 +80,7 @@ function q(query){
 		},
 		templateDefine: function(callback){
 			return this.forEach((node)=>{
+				node.setAttribute('data-template', 'true');
 				node.templateCallback = callback
 			})
 		},
