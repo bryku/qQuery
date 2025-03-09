@@ -1,4 +1,4 @@
-qVersion = 2;
+qVersion = 3;
 qCache = [];
 qCacheLimit = 50;
 qCacheQuery = (query)=>{
