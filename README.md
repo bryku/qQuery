@@ -2,7 +2,7 @@
 
 jQuery alternative (3.5kB)
 
-### .text()
+### .text() - v1
 
 Get or set innerText.
 
@@ -10,44 +10,44 @@ Get or set innerText.
     q('body').text(); // "Hello World"
     
 
-### .html()
+### .html() - v1
 
 Get or set innerHTML.
 
     q('body').html('Hello World);
     q('body').html(); // "Hello World"
 
-### .htmlPrepend()
+### .htmlPrepend() - v1
 
 Adds HTML to the beginning of an element.
 
     q('body').htmlPrepend('<h1>Start</h1>'); 
 
-### .htmlAppend()
+### .htmlAppend() - v1
 
 Adds HTML to the end of an element.
 
     q('body').htmlAppend('<h1>End</h1>');
 
-### .htmlReplace()
+### .htmlReplace() - v1
 
     q('body').htmlReplace('Hello World', 'Hello John'); 
 
-### .htmlFetch()
+### .htmlFetch() - v1
 
 Fetch text and sets it as `.innerHTML`.
 
     q('body').htmlFetch('./data/news.txt');
 
-### .templateDefine()
+### .templateDefine() - v1
 
 Defines a Template function.
 
-    q('ul').templateDefine((data, node)=>{
+    q('ul').templateDefine((data)=>{
         return data.forEach((v)=>{`<li>${v}</li>`)}.join('')
     });
 
-### .templateUpdate()
+### .templateUpdate() - v1
 
 Updates a Template.
 
@@ -57,47 +57,68 @@ Updates a Template.
         'Pudding',
     ]);
 
-### .templateFetch()
+### .templateFetch() - v1
 
 Fetches JSON Data and passes it to the `.templateDefine()` function.
 
     q('ul').templateFetch('./favoriteFood.json');
 
-### .classAdd()
+### .stateDefine() - v2
+
+    q('ul').stateDefine('favorite food', (food)=>{
+        return data.forEach((v)=>{`<li class="favoriteFood">${v}</li>`)}.join('')
+    });
+    q('ul').stateDefine('favorite drinks', (drinks)=>{
+        return data.forEach((v)=>{`<li class="favoriteDrinks">${v}</li>`)}.join('')
+    });
+
+### .stateUpdate() - v2
+
+    q('ul').templateUpdate('favorite food',[
+        'Cookies',
+        'Donats',
+        'Pudding',
+    ]);
+
+### .stateFetch() - v2
+
+    q('ul').stateFetch('favorite food', './favoriteFood.json');
+
+### .classAdd() - v1
 
     q('body').classAdd('background-grey');
 
-### .classRemove()
+### .classRemove() - v1
 
     q('body').classRemove('background-grey');
 
-### .classToggle()
+### .classToggle() - v1
 
     q('body').classToggle('background-grey');
 
-### .classContains()
+### .classContains() - v1
 
     q('body').classContains('background-grey') // true || false
 
-### .style()
+### .style() - v1
 
     q('body').style('background', 'red');
     q('body').style('background'); // "red"
 
-### .attribute()
+### .attribute() - v1
 
     q('body').attribute('data-name', 'john doe');
     q('body').attribute('data-name'); // "john doe"
 
-### .remove()
+### .remove() - v1
 
 Removes the Element from the document.
 
-### .empty()
+### .empty() - v1
 
 Removes the Element's children from the document.
 
-### .event()
+### .event() - v1
 
 Creates an event.
 
@@ -105,35 +126,35 @@ Creates an event.
         console.log('You clicked me!');
     })
 
-### .info()
+### .info() - v1
 
 Returns an object with w, h, x, y.
 
     q('button').info();
 
-### .parent()
+### .parent() - v1
 
 Gets parent element.
 
-### .query()
+### .query() - v1
 
 Query selects from an element going down.
 
     q('ul').query('li').remove();
 
-### .closest()
+### .closest() - v1
 
 Query selects from an element going up.
 
     q('input').closest('parent').remove();
 
-### .clone()
+### .clone() - v1
 
 Clones an element. 
 
     q('div').clone(); // "<div></div>"
 
-### .forEach()
+### .forEach() - v1
 
 Loops through your element returning the javascript element without the qQuery wrapper.
 
@@ -141,7 +162,7 @@ Loops through your element returning the javascript element without the qQuery w
         node.innerText = 'Click Me';
     });
 
-### .node()
+### .node() - v1
 
 Allows you to use a javascript element without the qQuery wrapper.
 
