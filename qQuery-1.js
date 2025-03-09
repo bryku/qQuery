@@ -78,28 +78,6 @@ function q(query){
 					.catch((err)=>{console.warn(`$('${this.query}').htmlFetch('${url}') - Error 404`)})
 			})
 		},
-		templateDefine: function(callback){
-			return this.forEach((node)=>{
-				node.templateCallback = callback
-			})
-		},
-		templateUpdate: function(data){
-			return this.forEach((node)=>{
-				if(!node.templateCallback){
-					console.warn(`$('${this.query}').templateUpdate() - No template defined`);
-				}else{
-					node.innerHTML = node.templateCallback(data, node)
-				}
-			})
-		},
-		templateFetch: function(url, options = {}){
-			this.forEach((node)=>{
-				fetch(url, options)
-					.then((res)=>{return res.json()})
-					.then((dat)=>{node.innerHTML = node.templateCallback(dat, node)})
-					.catch((err)=>{console.warn(`$('${this.query}').templateFetch('${url}') - Error 404`)})
-			})
-		},
 		classAdd: function(...classes){
 			return this.forEach((node)=>{
 				node.classList.add(...classes)
