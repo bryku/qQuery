@@ -1,81 +1,52 @@
-qVersion = 1;
-qCache = [];
-qCacheLimit = 50;
-qCacheQuery = (query)=>{
-	let q = qCache.find((object)=>{return object.query == query});
-	if(!q){
-		q = {
+let qVersion = '1.0';
+let qCache = {
+	limit: 50,
+	nodes: [],
+	limiter: function(){
+		setTimeout(()=>{
+			if(qCache.nodes.length > qCache.limit){
+				qCache.nodes.shift()
+			}
+		})
+	},
+	query: function(query){
+		this.limiter();
+		return (this.nodes.find((node)=>{
+			return node.query == query
+		}) || this.nodes.concat({
 			query: query,
 			node: document.querySelectorAll(query)
-		}
-		qCache.push(q)
-	}
-	if(qCache.length > qCacheLimit){
-		setTimeout(function(){
-			qCache.shift()
-		})
-	}
-	return q.node
+		}).at(-1)).node
+	},
 };
 function q(query){
 	return {
 		query: query,
-		nodes: typeof query == 'string' ? qCacheQuery(query) : query,
+		nodes: typeof query == 'string' ? qCache.query(query) : [query],
 		node: function(){return this.nodes[0]},
+		nodeClone: function(){
+			return this.nodes[0].cloneNode(true)
+		},
+		findChild: function(query){
+			return q(this.nodes[0].querySelector(query))
+		},
+		findParent: function(query){
+			return q(this.nodes[0].closests(query))
+		},
 		forEach: function(callback){
 			for(let i = 0; i < this.nodes.length; i++){
-				let v = callback(this.nodes[i], i, this.nodes);
-				if(v){return v}
+				let result = callback(this.nodes[i], i, this.nodes);
+				if(result){return result}
 			}
 			return this
 		},
-		value: function(str){
+
+
+		
+		attribute: function(atrribute, value = false){
+			if(!value){ return this.nodes[0].getAttribute(atrribute) }
 			return this.forEach((node)=>{
-				if(str){node.value = str}
-				else{return node.value}
-			})
-		},
-		values: function(){
-			let obj = {};
-			let dat = new FormData(this.nodes[0].closest('form'));
-			for(const key of dat.keys()){
-				obj[key] = dat.get(key)
-			}
-			return obj
-		},
-		text: function(str){
-			return this.forEach((node)=>{
-				if(str){node.innerText = str}
-				else{return node.innerText}
-			})
-		},
-		html: function(str){
-			return this.forEach((node)=>{
-				if(str){node.innerHTML = str}
-				else{return node.innerHTML}
-			})
-		},
-		htmlAppend: function(str){
-			return this.forEach((node)=>{
-				node.innerHTML += str
-			})
-		},
-		htmlPrepend: function(str){
-			return this.forEach((node)=>{
-				node.innerHTML = str + node.innerHTML
-			})
-		},
-		htmlReplace: function(str, newstr){
-			return this.forEach((node)=>{
-				node.innerHTML = node.innerHTML.replace(str, newstr)
-			})
-		},
-		htmlFetch: function(url, options = {}){
-			this.forEach((node)=>{
-				fetch(url, options)
-					.then((res)=>{return res.text()})
-					.then((txt)=>{node.innerHTML = txt})
-					.catch((err)=>{console.warn(`$('${this.query}').htmlFetch('${url}') - Error 404`)})
+				node.setAttribute(atrribute, value);
 			})
 		},
 		classAdd: function(...classes){
@@ -93,34 +64,115 @@ function q(query){
 				node.classList.toggle(...classes)
 			})
 		},
-		classContains: function(class_name){
-			this.nodes[0].classList.contains(class_name)
+		classContains: function(className){
+			return this.nodes[0].classList.contains(className)
 		},
 		classes: function(){
-			this.nodes[0].className.split(' ')
+			return this.nodes[0].className.split(' ')
 		},
-		style: function(style, value){
+		style: function(style, value = false){
+			if(!value){ return this.nodes[0].style[style] }
 			return this.forEach((node)=>{
-				if(value){node.style[style] = value}
-				else{return node.style[style]}
+				node.style[style] = value;
 			})
 		},
-		attribute: function(key, value){
+		value: function(value = false){
+			if(!value){ return this.nodes[0].value }
 			return this.forEach((node)=>{
-				if(value){node.setAttribute(key, value)}
-				else{return node.getAttribute(key)}
+				node.value = value;
 			})
 		},
+		text: function(text = false){
+			if(!text){ return this.nodes[0].innerText }
+			return this.forEach((node)=>{
+				node.innerText = text;
+			})
+		},
+		html: function(html = false){
+			if(!html){ return this.nodes[0].innerHTML }
+			return this.forEach((node)=>{
+				node.innerHTML = html;
+			})
+		},
+		htmlAppend: function(html = ''){
+			return this.forEach((node)=>{
+				node.innerHTML += html
+			})
+		},
+		htmlPrepend: function(html = ''){
+			return this.forEach((node)=>{
+				node.innerHTML = html + node.innerHTML
+			})
+		},
+		htmlReplace: function(match, replace){
+			return this.forEach((node)=>{
+				node.innerHTML = node.innerHTML.replace(match, replace)
+			})
+		},
+		htmlFetch: function(
+			url, 
+			options = {}, 
+			error = (err)=>{console.warn(`$('${this.query}').htmlFetch('${url}') - ${err}`)}
+		){
+			this.forEach((node)=>{
+				fetch(url, options)
+					.then((res)=>{return res.text()})
+					.then((txt)=>{node.innerHTML = txt})
+					.catch((err)=>{error(err)})
+			})
+		},
+		tmeplateDefine: function(callback){
+			return this.forEach((node)=>{
+				node.setAttribute('data-template', 'true');
+				node.templateCallback = callback;
+			})
+		},
+		templateUpdate: function(data){
+			return this.forEach((node)=>{
+				node.innerHTML = node.templateCallback(data, q(node))
+			})
+		},
+		templateFetch: function(
+			url, 
+			options = {}, 
+			error = (err)=>{console.warn(`$('${this.query}').templateFetch('${url}') - ${err}`)}
+		){
+			this.forEach((node)=>{
+				fetch(url, options)
+					.then((res)=>{return res.json()})
+					.then((dat)=>{node.innerHTML = node.templateCallback(dat)})
+					.catch((err)=>{error(err)})
+			})
+		},
+		stateDefine: function(state, callback){
+			return this.forEach((node)=>{
+				node.setAttriute('data-state', state);
+				node.states = node.states || {};
+				node.states[state] = callback;
+			})
+		},
+		stateUpdate: function(state, data){
+			return this.forEach((node)=>{
+				node.innerHTML = node.states[state](data, q(node))
+			})
+		},
+		stateFetch: function(
+			state, 
+			url, 
+			options = {}, 
+			error = (err)=>{console.warn(`$('${this.query}').stateFetch('${url}') - ${err}`)}
+		){
+			fetch(url, options)
+				.then((res)=>{return res.json()})
+				.then((dat)=>{node.innerHTML = node.states[state](dat, q(node))})
+				.catch((err)=>{error(err)})
+		},
+
+
+
 		remove: function(){
 			return this.forEach((node)=>{
 				node.remove()
-			})
-		},
-		empty: function(){
-			return this.forEach((node)=>{
-				for(let i = 0; i < node.children.length; i++){
-					node.children[i].remove()
-				}
 			})
 		},
 		event: function(type, callback){
@@ -129,7 +181,19 @@ function q(query){
 			})
 		},
 		click: function(){
-			this.nodes[0].click()
+			return this.forEach((node)=>{
+				node.click()
+			})
+		},
+		hide: function(){
+			return this.forEach((node)=>{
+				node.hidden = true
+			})
+		},
+		show: function(){
+			return this.forEach((node)=>{
+				node.hidden = false
+			})
 		},
 		info: function(){
 			return {
@@ -139,17 +203,34 @@ function q(query){
 				y: this.nodes[0].offsetTop,
 			}
 		},
-		parent: function(){
-			return q(this.nodes[0].parentElement)
+		type: function(){
+			return this.nodes[0].tagName || this.nodes[0].nodeName
 		},
-		closest: function(query){
-			return q(this.nodes[0].closest(query))
+	
+
+		
+		formData: function(form = this.nodes[0]){
+			let dat = new FormData(form);
+			let obj = {};
+			for(const key of dat.keys()){
+				obj[key] = dat.get(key)
+			}
+			return obj	
 		},
-		query: function(query){
-			return q(this.nodes[0].querySelector(query))
+		formValidate: function(callback){
+			this.nodes[0].formValidate = callback;
+			return this
 		},
-		clone: function(){
-			return this.nodes[0].cloneNode(true)
+		formSubmit: function(callback){
+			this.nodes[0].formSubmit = callback;
+			this.nodes[0].addEventListener('submit', (event)=>{
+				event.preventDefault();
+				let form = event.target.closest('form');
+				let data = this.formData(form);
+				let validate = form.formValidate(data, q(form));
+				if(validate){ form.formSubmit(data, q(form)) }
+			});
+			return this
 		},
 	}
 }
