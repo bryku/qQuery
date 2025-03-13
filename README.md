@@ -1,6 +1,6 @@
 # qQuery
 
-jQuery alternative (6.5kB)
+jQuery alternative at 4.8kb (qQuery-1.min.js) or 6.5kb (qQuery-1.js).
 
 ---
 
