@@ -1,6 +1,6 @@
 # qQuery
 
-jQuery alternative (4.9kB)
+jQuery alternative (6.5kB)
 
 ---
 
