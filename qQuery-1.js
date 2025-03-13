@@ -46,7 +46,7 @@ function q(query){
 		attribute: function(attribute, value = false){
 			if(!value){ return this.nodes[0].getAttribute(attribute) }
 			return this.forEach((node)=>{
-				node.setAttribute(atrribute, value)
+				node.setAttribute(attribute, value)
 			})
 		},
 		classAdd: function(...classes){
