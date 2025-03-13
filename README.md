@@ -82,8 +82,6 @@ Gets the attribute value, making it similar to:
 
 
 
-
-
 ###  q('button').attribute(attribute, value)
 
 Updates the attribute value, making it similar to:
@@ -123,6 +121,7 @@ Toggles a class on a node, making it similar to:
 ```
 
 
+
 ### q('body').classContains('...')
 
 Returns true is class if found or false if not, making it similar to:
@@ -150,6 +149,8 @@ Gets the value of a style, making it similar to:
 ```
     document.body.style.background
 ```
+
+
 
 ### q('body').style('background', 'red')
 
@@ -221,123 +222,188 @@ Automatically fetches HTML and inserts it into the node.
 
 
 
-### 
+### q('ul').templateDefine(()=>{ ... })
 
+Defines a template.
 
-		templateDefine: function(callback){
-			return this.forEach((node)=>{
-				node.setAttribute('data-template', 'true');
-				node.templateCallback = callback;
-			})
-		},
-		templateUpdate: function(data){
-			return this.forEach((node)=>{
-				node.innerHTML = node.templateCallback(data, q(node))
-			})
-		},
-		templateFetch: function(
-			url, 
-			options = {}, 
-			error = (err)=>{console.warn(`$('${this.query}').templateFetch('${url}') - ${err}`)}
-		){
-			this.forEach((node)=>{
-				fetch(url, options)
-					.then((res)=>{return res.json()})
-					.then((dat)=>{node.innerHTML = node.templateCallback(dat)})
-					.catch((err)=>{error(err)})
-			})
-		},
-		stateDefine: function(state, callback){
-			return this.forEach((node)=>{
-				node.setAttribute('data-state', state);
-				node.states = node.states || {};
-				node.states[state] = callback;
-			})
-		},
-		stateUpdate: function(state, data){
-			return this.forEach((node)=>{
-				node.innerHTML = node.states[state](data, q(node))
-			})
-		},
-		stateFetch: function(
-			state, 
-			url, 
-			options = {}, 
-			error = (err)=>{console.warn(`$('${this.query}').stateFetch('${url}') - ${err}`)}
-		){
-			return this.forEach((node)=>{
-				fetch(url, options)
-					.then((res)=>{return res.json()})
-					.then((dat)=>{node.innerHTML = node.states[state](dat, q(node))})
-					.catch((err)=>{error(err)})
-			})
-		},
+```
+    q('ul').templateDefine((array)=>{
+        return array.map((item)=>{
+            return `<li>${item}</li>`
+        }).join('')
+    });
+    q('ul).templateUpdate(['Apple', 'Blueberry', 'Carrot']);
+```
 
 
 
-		remove: function(){
-			return this.forEach((node)=>{
-				node.remove()
-			})
-		},
-		event: function(type, callback){
-			return this.forEach((node)=>{
-				node.addEventListener(type, callback)
-			})
-		},
-		click: function(){
-			return this.forEach((node)=>{
-				node.click()
-			})
-		},
-		hide: function(){
-			return this.forEach((node)=>{
-				node.hidden = true
-			})
-		},
-		show: function(){
-			return this.forEach((node)=>{
-				node.hidden = false
-			})
-		},
-		info: function(){
-			return {
-				w: this.nodes[0].offsetWidth,
-				h: this.nodes[0].offsetHeight,
-				x: this.nodes[0].offsetLeft,
-				y: this.nodes[0].offsetTop,
-			}
-		},
-		type: function(){
-			return this.nodes[0].tagName || this.nodes[0].nodeName
-		},
-	
+### q('ul').templateUpdate(...)
 
-		
-		formData: function(form = this.nodes[0]){
-			let dat = new FormData(form);
-			let obj = {};
-			for(const key of dat.keys()){
-				obj[key] = dat.get(key)
-			}
-			return obj	
-		},
-		formValidate: function(callback){
-			this.nodes[0].formValidate = callback;
-			return this
-		},
-		formSubmit: function(callback){
-			this.nodes[0].formSubmit = callback;
-			this.nodes[0].addEventListener('submit', (event)=>{
-				event.preventDefault();
-				let form = event.target.closest('form');
-				let data = this.formData(form);
-				let validate = form.formValidate(data, q(form));
-				if(validate){ form.formSubmit(data, q(form)) }
-			});
-			return this
-		},
-	}
-}
+Updates a template.
+
+```
+    q('ul').templateDefine((array)=>{
+        return array.map((item)=>{
+            return `<li>${item}</li>`
+        }).join('')
+    });
+    q('ul).templateUpdate(['Apple', 'Blueberry', 'Carrot']);
+```
+
+
+
+### q('ul').templateFetch(url, options)
+
+Fetches JSON to automatically update a template.
+
+```
+    q('ul').templateDefine((array)=>{
+        return array.map((item)=>{
+            return `<li>${item}</li>`
+        }).join('')
+    });
+    q('ul').templateFetch('/api/news')
+```
+
+
+
+### q('ul').stateDefine(name, callback)
+
+Defines a State which allows you to use multiple templates.
+
+```
+    q('ul').stateDefine('food', (array)=>{
+        return array.map((item)=>{
+            return `<li class="food">${item}</li>`
+        }).join('')
+    });
+    q('ul').stateDefine('animals', (array)=>{
+        return array.map((item)=>{
+            return `<li class="animals'>${item}</li>`
+        }).join('')
+    });
+    q('ul').stateUpdate('food', ['Apple', 'Blueberry', 'Carrot']);
+```
+
+
+
+### q('ul').stateUpdate(name, ...)
+
+Updates a state.
+
+```
+    q('ul').stateDefine('food', (array)=>{
+        return array.map((item)=>{
+            return `<li class="food">${item}</li>`
+        }).join('')
+    });
+    q('ul').stateDefine('animals', (array)=>{
+        return array.map((item)=>{
+            return `<li class="animals'>${item}</li>`
+        }).join('')
+    });
+    q('ul').stateUpdate('food', ['Apple', 'Blueberry', 'Carrot']);
+```
+
+
+### q('ul').stateFetch(name, ...)
+
+Fetches json to automatically update a state.
+
+```
+    q('ul').stateDefine('food', (array)=>{
+        return array.map((item)=>{
+            return `<li class="food">${item}</li>`
+        }).join('')
+    });
+    q('ul').stateDefine('animals', (array)=>{
+        return array.map((item)=>{
+            return `<li class="animals'>${item}</li>`
+        }).join('')
+    });
+    q('ul').stateUpdate('food', ['Apple', 'Blueberry', 'Carrot']);
+```
+
+### q('button').remove()
+
+Removes the node from dom (document).
+
+
+
+### q('button').click()
+
+Triggers the click event on a node.
+
+
+
+### q('button').hide()
+
+Hides an node in dom.
+
+
+
+### q('button').show()
+
+
+Shows an element in dom.
+
+
+
+### q('button').event(type, ()=>{})
+
+Creates an event listener.
+
+
+
+### q('button').type()
+
+Gets the node type.
+
+```
+    q('button').type() // "BUTTON"
+```
+
+
+
+### q('button').info()
+
+Gets position information.
+
+```
+    q('button').info() 
+    
+    // {w: ...., h: ..., x: ..., y:...}
+```
+
+### q('form').formValidate((data)=>{ ... })
+
+Validates the form before submitting.
+
+```
+    q('form').formValidate((data)=>{
+        if(data.password.length == 0){
+            return false; 
+        }
+        return true
+    }).formSubmit((data)=>{
+        console.log(data);
+    })
+```
+
+### q('form').formSubmit((data)=>{ ... })
+
+Handles the form if validation is true.
+
+```
+    q('form').formValidate((data)=>{
+        if(data.password.length == 0){
+            return false; 
+        }
+        return true
+    }).formSubmit((data)=>{
+        console.log(data);
+    })
+```
+
 
 
