@@ -91,7 +91,7 @@ function q(query){
 		html: function(html = false){
 			if(!html){ return this.nodes[0].innerHTML }
 			return this.forEach((node)=>{
-				node.innerHTML = html;
+				node.innerHTML = html
 			})
 		},
 		htmlAppend: function(html = ''){
