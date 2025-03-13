@@ -46,7 +46,7 @@ function q(query){
 		attribute: function(atrribute, value = false){
 			if(!value){ return this.nodes[0].getAttribute(atrribute) }
 			return this.forEach((node)=>{
-				node.setAttribute(atrribute, value);
+				node.setAttribute(atrribute, value)
 			})
 		},
 		classAdd: function(...classes){
@@ -73,19 +73,19 @@ function q(query){
 		style: function(style, value = false){
 			if(!value){ return this.nodes[0].style[style] }
 			return this.forEach((node)=>{
-				node.style[style] = value;
+				node.style[style] = value
 			})
 		},
 		value: function(value = false){
 			if(!value){ return this.nodes[0].value }
 			return this.forEach((node)=>{
-				node.value = value;
+				node.value = value
 			})
 		},
 		text: function(text = false){
 			if(!text){ return this.nodes[0].innerText }
 			return this.forEach((node)=>{
-				node.innerText = text;
+				node.innerText = text
 			})
 		},
 		html: function(html = false){
@@ -121,7 +121,7 @@ function q(query){
 					.catch((err)=>{error(err)})
 			})
 		},
-		tmeplateDefine: function(callback){
+		templateDefine: function(callback){
 			return this.forEach((node)=>{
 				node.setAttribute('data-template', 'true');
 				node.templateCallback = callback;
@@ -146,7 +146,7 @@ function q(query){
 		},
 		stateDefine: function(state, callback){
 			return this.forEach((node)=>{
-				node.setAttriute('data-state', state);
+				node.setAttribute('data-state', state);
 				node.states = node.states || {};
 				node.states[state] = callback;
 			})
@@ -162,10 +162,12 @@ function q(query){
 			options = {}, 
 			error = (err)=>{console.warn(`$('${this.query}').stateFetch('${url}') - ${err}`)}
 		){
-			fetch(url, options)
-				.then((res)=>{return res.json()})
-				.then((dat)=>{node.innerHTML = node.states[state](dat, q(node))})
-				.catch((err)=>{error(err)})
+			return this.forEach((node)=>{
+				fetch(url, options)
+					.then((res)=>{return res.json()})
+					.then((dat)=>{node.innerHTML = node.states[state](dat, q(node))})
+					.catch((err)=>{error(err)})
+			})
 		},
 
 
