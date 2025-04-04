@@ -1,4 +1,4 @@
-let qVersion = '1.0';
+// https://github.com/bryku/qQuery
 let qCache = {
 	limit: 50,
 	nodes: [],
